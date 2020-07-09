@@ -157,13 +157,25 @@ impl Cube {
 
             // 全体回転
             MovementFace::X => {
-                self.turn_face(CubeFace::Front, count);
+                self.turn_face(CubeFace::Right, count);
+                self.turn_face(CubeFace::Left, 4 - count);
+                for i in 0..(self.divisions) {
+                    self.turn_layer_x(i, count);
+                }
             }
             MovementFace::Y => {
-                self.turn_face(CubeFace::Front, count);
+                self.turn_face(CubeFace::Up, count);
+                self.turn_face(CubeFace::Down, 4 - count);
+                for i in 0..(self.divisions) {
+                    self.turn_layer_y(i, count);
+                }
             }
             MovementFace::Z => {
                 self.turn_face(CubeFace::Front, count);
+                self.turn_face(CubeFace::Back, 4 - count);
+                for i in 0..(self.divisions) {
+                    self.turn_layer_z(i, count);
+                }
             }
         }
         Ok(())
