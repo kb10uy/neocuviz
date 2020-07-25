@@ -1,4 +1,6 @@
+mod svg;
 mod fru;
+
 pub use fru::Fru;
 
 use crate::cube::Cube;

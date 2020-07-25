@@ -8,3 +8,15 @@ edition = "2018"
 
 [dependencies.neocuviz]
 path = "../neocuviz"
+
+[dependencies.clap]
+version = "3.0.0-beta.1"
+
+[dependencies.image]
+version = "0.23"
+
+[dependencies.resvg]
+version = "0.11"
+
+[dependencies.usvg]
+version = "0.11"
