@@ -80,15 +80,13 @@ fn main() -> IoResult<()> {
             let options = Options::default();
             let tree = Tree::from_data(&svg_src, &options).expect("Valid SVG should be generated");
             let img_src = resvg::render(&tree, FitTo::Original, None).unwrap();
-            img_src.save_png(args.output.unwrap())?;
-            /*
+
             let (w, h) = (img_src.width(), img_src.height());
             let img_data = img_src.take();
             let encoder = PNGEncoder::new(writer);
             encoder
                 .encode(&img_data, w, h, ColorType::Rgba8)
-                .map_err(|_| IoError::new(ErrorKind::Other, "Unknown format type"))?;
-            */
+                .map_err(|_| IoError::new(ErrorKind::Other, "Failed to encode PNG"))?;
         }
         _ => {
             return Err(IoError::new(ErrorKind::Other, "Unknown format type"));
