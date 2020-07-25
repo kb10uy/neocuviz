@@ -1,5 +1,7 @@
-mod notation;
-mod cube;
+pub mod notation;
+pub mod cube;
+pub mod exporter;
+pub mod converter;
 
 #[cfg(test)]
 mod tests {

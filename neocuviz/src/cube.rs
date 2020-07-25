@@ -61,7 +61,7 @@ impl Cube {
         let mut face_transform_source = Vec::with_capacity(divisions * divisions);
         for i in 0..(divisions * divisions) {
             let (x1, y1) = (i % divisions, i / divisions);
-            let (x2, y2) = (divisions - 1 - y1, x1);
+            let (x2, y2) = (y1, divisions - x1 - 1);
             let i_90 = y2 * divisions + x2;
             face_transform_source.push(i_90);
         }
@@ -85,6 +85,14 @@ impl Cube {
             faces,
             divisions,
         }
+    }
+
+    pub fn divisions(&self) -> usize {
+        self.divisions
+    }
+
+    pub fn faces(&self) -> &HashMap<CubeFace, Box<[CubeFace]>> {
+        &self.faces
     }
 
     /// 回転操作を適用する。
@@ -219,7 +227,8 @@ impl Cube {
                 &up_column,
                 true,
             );
-            self.swap_to_column(CubeFace::Down, column_front, &back_column, true);
+            let down_column = self.swap_to_column(CubeFace::Down, column_front, &back_column, true);
+            self.swap_to_column(CubeFace::Front, column_front, &down_column, false);
         }
     }
 
@@ -232,8 +241,9 @@ impl Cube {
         for _ in 0..count {
             let right_row = self.extract_row(CubeFace::Right, row_right);
             let front_row = self.swap_to_row(CubeFace::Front, row_right, &right_row, false);
-            let down_row = self.swap_to_row(CubeFace::Left, row_right, &front_row, false);
-            self.swap_to_row(CubeFace::Back, row_right, &down_row, false);
+            let left_row = self.swap_to_row(CubeFace::Left, row_right, &front_row, false);
+            let back_row = self.swap_to_row(CubeFace::Back, row_right, &left_row, false);
+            self.swap_to_row(CubeFace::Right, row_right, &back_row, false);
         }
     }
 
@@ -247,13 +257,14 @@ impl Cube {
             let up_row = self.extract_row(CubeFace::Up, row_up);
             let right_column =
                 self.swap_to_column(CubeFace::Right, self.divisions - 1 - row_up, &up_row, false);
-            let down_row = self.swap_to_column(
+            let down_row = self.swap_to_row(
                 CubeFace::Down,
                 self.divisions - 1 - row_up,
                 &right_column,
                 true,
             );
-            self.swap_to_column(CubeFace::Left, row_up, &down_row, false);
+            let left_row = self.swap_to_column(CubeFace::Left, row_up, &down_row, false);
+            self.swap_to_row(CubeFace::Up, row_up, &left_row, true);
         }
     }
 
@@ -305,11 +316,11 @@ impl Cube {
             .expect("Existing faces should be registered");
 
         if invert {
-            for (i, &v) in values.iter().enumerate() {
+            for (i, &v) in values.iter().rev().enumerate() {
                 face[target_row * self.divisions + i] = v;
             }
         } else {
-            for (i, &v) in values.iter().rev().enumerate() {
+            for (i, &v) in values.iter().enumerate() {
                 face[target_row * self.divisions + i] = v;
             }
         }
@@ -333,11 +344,11 @@ impl Cube {
             .expect("Existing faces should be registered");
 
         if invert {
-            for (i, &v) in values.iter().enumerate() {
+            for (i, &v) in values.iter().rev().enumerate() {
                 face[target_column + self.divisions * i] = v;
             }
         } else {
-            for (i, &v) in values.iter().rev().enumerate() {
+            for (i, &v) in values.iter().enumerate() {
                 face[target_column + self.divisions * i] = v;
             }
         }
