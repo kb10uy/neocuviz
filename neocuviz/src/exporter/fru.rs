@@ -157,7 +157,7 @@ impl Fru {
 
         // F 面
         for i in 0..9 {
-            let color = &self.colors[&faces[&CubeFace::Up][i]];
+            let color = &self.colors[&faces[&CubeFace::Front][i]];
             let (x, y) = (i % 3, i / 3);
             let base = (
                 right_diff.0 * x as f64 + down_diff.0 * y as f64 + 0.8 * (FRAC_PI_6 * 5.0).cos(),
@@ -182,7 +182,7 @@ impl Fru {
 
         // R 面
         for i in 0..9 {
-            let color = &self.colors[&faces[&CubeFace::Up][i]];
+            let color = &self.colors[&faces[&CubeFace::Right][i]];
             let (x, y) = (i % 3, i / 3);
             let base = (
                 -left_diff.0 * x as f64 + down_diff.0 * y as f64,
