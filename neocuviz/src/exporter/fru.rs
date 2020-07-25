@@ -145,17 +145,17 @@ impl Fru {
         colors.insert(CubeFace::Left, "#f90");
         colors.insert(CubeFace::Right, "#f30");
         colors.insert(CubeFace::Up, "#fff");
-        colors.insert(CubeFace::Down, "#fc0");
+        colors.insert(CubeFace::Down, "#ff0");
 
         let faces = cube.faces();
-        eprintln!("{:?}", faces);
 
+        // U 面
         for i in 0..9 {
             let color = colors[&faces[&CubeFace::Up][i]];
             let (x, y) = (i % 3, i / 3);
             let base = (
                 right_diff.0 * x as f64 + left_diff.0 * y as f64,
-                right_diff.1 * x as f64 + left_diff.1 * y as f64,
+                right_diff.1 * x as f64 + left_diff.1 * y as f64 + line_length,
             );
 
             writeln!(
@@ -170,6 +170,58 @@ impl Fru {
                 self.size - base.1 - down_diff.1,
                 self.size + base.0 + left_diff.0,
                 self.size - base.1 - left_diff.1,
+            )?;
+        }
+
+        // F 面
+        for i in 0..9 {
+            let color = colors[&faces[&CubeFace::Front][i]];
+            let (x, y) = (i % 3, i / 3);
+            let base = (
+                right_diff.0 * x as f64
+                    + down_diff.0 * y as f64
+                    + line_length * (FRAC_PI_6 * 5.0).cos(),
+                right_diff.1 * x as f64
+                    + down_diff.1 * y as f64
+                    + line_length * (FRAC_PI_6 * 5.0).sin(),
+            );
+
+            writeln!(
+                writer,
+                r#"  <polygon fill="{}" points="{} {}, {} {}, {} {}, {} {}"/>"#,
+                color,
+                self.size + base.0,
+                self.size - base.1,
+                self.size + base.0 + right_diff.0,
+                self.size - base.1 - right_diff.1,
+                self.size + base.0 + right_diff.0 + down_diff.0,
+                self.size - base.1 - right_diff.1 - down_diff.1,
+                self.size + base.0 + down_diff.0,
+                self.size - base.1 - down_diff.1,
+            )?;
+        }
+
+        // R 面
+        for i in 0..9 {
+            let color = colors[&faces[&CubeFace::Right][i]];
+            let (x, y) = (i % 3, i / 3);
+            let base = (
+                -left_diff.0 * x as f64 + down_diff.0 * y as f64,
+                -left_diff.1 * x as f64 + down_diff.1 * y as f64,
+            );
+
+            writeln!(
+                writer,
+                r#"  <polygon fill="{}" points="{} {}, {} {}, {} {}, {} {}"/>"#,
+                color,
+                self.size + base.0,
+                self.size - base.1,
+                self.size + base.0 - left_diff.0,
+                self.size - base.1 + left_diff.1,
+                self.size + base.0 + right_diff.0,
+                self.size - base.1 - right_diff.1,
+                self.size + base.0 + down_diff.0,
+                self.size - base.1 - down_diff.1,
             )?;
         }
 
