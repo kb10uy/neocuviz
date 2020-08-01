@@ -105,7 +105,7 @@ impl SvgEmitter {
                 let (ex, ey) = self.transform_point(*end);
                 write!(
                     writer,
-                    r#"<line stroke-width="{}" stroke="{}" x1="{}" y1="{}" x2="{}" y2="{}"/>"#,
+                    r#"<line stroke-width="{:.5}" stroke="{}" x1="{:.5}" y1="{:.5}" x2="{:.5}" y2="{:.5}"/>"#,
                     thickness * self.transform_scale,
                     color,
                     sx,
@@ -121,7 +121,7 @@ impl SvgEmitter {
             } => {
                 write!(
                     writer,
-                    r#"<polyline stroke-width="{}" stroke="{}" fill="none" points=""#,
+                    r#"<polyline stroke-width="{:.5}" stroke="{}" fill="none" points=""#,
                     thickness * self.transform_scale,
                     color
                 )?;
@@ -138,13 +138,13 @@ impl SvgEmitter {
             } => {
                 write!(
                     writer,
-                    r#"<polygon stroke-width="{}" stroke="{}" fill="none" points=""#,
+                    r#"<polygon stroke-width="{:.5}" stroke="{}" fill="none" points=""#,
                     thickness * self.transform_scale,
                     color
                 )?;
                 for point in points.iter() {
                     let (x, y) = self.transform_point(*point);
-                    write!(writer, "{} {},", x, y)?;
+                    write!(writer, "{:.5} {:.5},", x, y)?;
                 }
                 write!(writer, r#""/>"#)?;
             }
@@ -152,7 +152,7 @@ impl SvgEmitter {
                 write!(writer, r#"<polygon fill="{}" points=""#, color)?;
                 for point in points.iter() {
                     let (x, y) = self.transform_point(*point);
-                    write!(writer, "{} {},", x, y)?;
+                    write!(writer, "{:.5} {:.5},", x, y)?;
                 }
                 write!(writer, r#""/>"#)?;
             }
@@ -165,7 +165,7 @@ impl SvgEmitter {
             } => {
                 write!(
                     writer,
-                    r#"<polygon fill="{}" stroke="{}" stroke-width="{}" points=""#,
+                    r#"<polygon fill="{}" stroke="{}" stroke-width="{:.5}" points=""#,
                     fill_color,
                     stroke_color,
                     thickness * self.transform_scale

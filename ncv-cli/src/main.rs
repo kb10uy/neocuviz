@@ -68,14 +68,14 @@ fn main() -> IoResult<()> {
     // 入力と出力
     let (mut stdin_instance, mut stdout_instance);
     let (mut infile, mut outfile);
-    let reader: &mut dyn Read = if let Some(filename) = args.movements {
+    let reader: &mut dyn Read = if let Some(filename) = &args.movements {
         infile = BufReader::new(File::open(filename)?);
         &mut infile
     } else {
         stdin_instance = BufReader::new(stdin());
         &mut stdin_instance
     };
-    let writer: &mut dyn Write = if let Some(filename) = args.output {
+    let writer: &mut dyn Write = if let Some(filename) = &args.output {
         outfile = BufWriter::new(File::create(filename)?);
         &mut outfile
     } else {
@@ -108,6 +108,7 @@ fn main() -> IoResult<()> {
             cube.apply(*movement).unwrap();
         }
     }
+
 
     // 描画
     let mut exporter: Box<dyn Exporter> = match &args.view_type[..] {
