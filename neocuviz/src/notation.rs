@@ -3,6 +3,7 @@ use std::{
     fmt::{Display, Formatter, Result as FmtResult},
     iter::Peekable,
     str::Chars,
+    borrow::Borrow,
 };
 
 /// 操作対象のキューブの面を表す。
@@ -66,6 +67,27 @@ pub struct Movement {
 
     /// 回転する方向
     pub direction: Rotation,
+}
+
+impl Movement {
+    /// 逆操作を返す。
+    pub fn inverse(&self) -> Movement {
+        Movement {
+            target: self.target,
+            direction: match self.direction {
+                Rotation::Clockwise => Rotation::Counterclockwise,
+                Rotation::Counterclockwise => Rotation::Clockwise,
+                Rotation::Turnover => Rotation::Turnover,
+            },
+        }
+    }
+
+    /// 逆手順を返す。
+    pub fn inverse_sequence(
+        sequence: impl DoubleEndedIterator<Item = impl Borrow<Movement>>,
+    ) -> impl Iterator<Item = Movement> {
+        sequence.map(|m| m.borrow().inverse()).rev()
+    }
 }
 
 /// 回転記号のエラーを表す。

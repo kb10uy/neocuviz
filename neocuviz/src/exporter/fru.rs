@@ -1,6 +1,6 @@
 use super::{
     svg::{SvgElement, SvgEmitter},
-    Exporter,
+    Exporter, ExporterParameters,
 };
 use crate::cube::{Cube, CubeFace};
 
@@ -11,24 +11,27 @@ use std::{
 };
 
 /// F, R, U 面が表示される `Exporter`。
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct Fru {
     size: f64,
     colors: HashMap<CubeFace, String>,
 }
 
-impl Fru {
-    pub fn new(size: f64) -> Fru {
-        let mut colors = HashMap::new();
-        colors.insert(CubeFace::Front, "#3f0".into());
-        colors.insert(CubeFace::Back, "#03c".into());
-        colors.insert(CubeFace::Left, "#f90".into());
-        colors.insert(CubeFace::Right, "#f30".into());
-        colors.insert(CubeFace::Up, "#fff".into());
-        colors.insert(CubeFace::Down, "#ff0".into());
-
-        Fru { size, colors }
+impl Exporter for Fru {
+    fn set_params(&mut self, params: &ExporterParameters) {
+        self.colors = params.colors.clone();
+        self.size = params.size;
     }
 
+    fn write(&self, cube: &Cube, writer: &mut dyn Write) -> IoResult<()> {
+        let mut emitter = SvgEmitter::new(self.size, self.size);
+        self.draw_faces(&mut emitter, cube)?;
+        self.draw_frame(&mut emitter, cube)?;
+        emitter.emit(writer)
+    }
+}
+
+impl Fru {
     fn draw_frame(&self, emitter: &mut SvgEmitter, cube: &Cube) -> IoResult<()> {
         // 外枠
         let points = (0..6)
@@ -157,7 +160,7 @@ impl Fru {
 
         // F 面
         for i in 0..9 {
-            let color = &self.colors[&faces[&CubeFace::Up][i]];
+            let color = &self.colors[&faces[&CubeFace::Front][i]];
             let (x, y) = (i % 3, i / 3);
             let base = (
                 right_diff.0 * x as f64 + down_diff.0 * y as f64 + 0.8 * (FRAC_PI_6 * 5.0).cos(),
@@ -182,7 +185,7 @@ impl Fru {
 
         // R 面
         for i in 0..9 {
-            let color = &self.colors[&faces[&CubeFace::Up][i]];
+            let color = &self.colors[&faces[&CubeFace::Right][i]];
             let (x, y) = (i % 3, i / 3);
             let base = (
                 -left_diff.0 * x as f64 + down_diff.0 * y as f64,
@@ -203,14 +206,5 @@ impl Fru {
         }
 
         Ok(())
-    }
-}
-
-impl Exporter for Fru {
-    fn write<W: Write>(&self, cube: &Cube, mut writer: W) -> IoResult<()> {
-        let mut emitter = SvgEmitter::new(self.size, self.size);
-        self.draw_faces(&mut emitter, cube)?;
-        self.draw_frame(&mut emitter, cube)?;
-        emitter.emit(&mut writer)
     }
 }

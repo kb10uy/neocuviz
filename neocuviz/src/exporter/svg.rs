@@ -32,6 +32,14 @@ pub enum SvgElement {
         color: String,
         points: Box<[(f64, f64)]>,
     },
+
+    /// 輪郭を含む多角形
+    StrokeFillPolygon {
+        stroke_color: String,
+        fill_color: String,
+        thickness: f64,
+        points: Box<[(f64, f64)]>,
+    },
 }
 
 /// SVG 出力のヘルパー。
@@ -113,7 +121,7 @@ impl SvgEmitter {
             } => {
                 write!(
                     writer,
-                    r#"<polyline stroke-width="{}" stroke="{}" points=""#,
+                    r#"<polyline stroke-width="{}" stroke="{}" fill="none" points=""#,
                     thickness * self.transform_scale,
                     color
                 )?;
@@ -130,7 +138,7 @@ impl SvgEmitter {
             } => {
                 write!(
                     writer,
-                    r#"<polygon stroke-width="{}" stroke="{}" fill="transparent" points=""#,
+                    r#"<polygon stroke-width="{}" stroke="{}" fill="none" points=""#,
                     thickness * self.transform_scale,
                     color
                 )?;
@@ -142,6 +150,26 @@ impl SvgEmitter {
             }
             SvgElement::FillPolygon { color, points } => {
                 write!(writer, r#"<polygon fill="{}" points=""#, color)?;
+                for point in points.iter() {
+                    let (x, y) = self.transform_point(*point);
+                    write!(writer, "{} {},", x, y)?;
+                }
+                write!(writer, r#""/>"#)?;
+            }
+
+            SvgElement::StrokeFillPolygon {
+                stroke_color,
+                fill_color,
+                thickness,
+                points,
+            } => {
+                write!(
+                    writer,
+                    r#"<polygon fill="{}" stroke="{}" stroke-width="{}" points=""#,
+                    fill_color,
+                    stroke_color,
+                    thickness * self.transform_scale
+                )?;
                 for point in points.iter() {
                     let (x, y) = self.transform_point(*point);
                     write!(writer, "{} {},", x, y)?;
